@@ -8,17 +8,3 @@ Code for the [paper](https://openreview.net/forum?id=S5VMqz-IBRV) to appear at [
 ## Disclaimer
 
 This is **not** an official Symanto product!
-
-## Citation
-
-```
-@inproceedings{label-tuning,
-    title = "{Few}-{Shot} {Learning} with {Siamese} {Networks} and {Label} {Tuning}",
-    author = {Müller, Thomas and Pérez-Torró, Guillermo and Franco-Salvador, Marc},
-    booktitle = "Proceedings of ACL",
-    year = "2022",
-    url = "https://openreview.net/forum?id=S5VMqz-IBRV",
-}
-```
-
-
