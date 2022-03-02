@@ -27,7 +27,7 @@ This is **not** an official Symanto product!
 ## How to Cite
 
 ```
-@inproceedings{labeltuning,
+@inproceedings{labeltuning2022,
 	title        = {{Few-Shot} {Learning} with {Siamese} {Networks} and {Label} {Tuning}},
 	author       = {M{\"u}ller, Thomas and Pérez-Torró, Guillermo and Franco-Salvador, Marc},
 	year         = {2022},
