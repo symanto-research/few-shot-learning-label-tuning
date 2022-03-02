@@ -23,3 +23,15 @@ For the sake of comparability we trained 4 models both English and multi-lingual
 ## Disclaimer
 
 This is **not** an official Symanto product!
+
+## How to Cite
+
+```
+@inproceedings{labeltuning,
+	title        = {{Few-Shot} {Learning} with {Siamese} {Networks} and {Label} {Tuning}},
+	author       = {M{\"u}ller, Thomas and Pérez-Torró, Guillermo and Franco-Salvador, Marc},
+	year         = {2022},
+	booktitle    = {ACL (to appear)},
+	url          = {https://openreview.net/forum?id=za_XIJLkkB8},
+}
+```
