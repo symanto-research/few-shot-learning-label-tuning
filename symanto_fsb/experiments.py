@@ -76,7 +76,11 @@ def run_experiment(
     n_test_examples: Optional[int],
 ):
 
-    data_dict = load_dataset(dataset, config)
+    try:
+        data_dict = load_dataset(dataset, config)
+    except Exception as error:
+        print(f"Could not load dataset {dataset}: {error}")
+        return
     labels = data_dict["test"].features["label"]
     hypotheses = {
         label: to_hypothesis(label, dataset, config) for label in labels.names

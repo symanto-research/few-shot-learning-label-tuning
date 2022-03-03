@@ -24,6 +24,7 @@ app = typer.Typer()
 def evaluate_char_svm(
     output_dir: Path,
     n_examples: int = 8,
+    n_trials: int = 5,
     multilingual: bool = True,
     n_test_examples: Optional[int] = None,
 ):
@@ -44,6 +45,7 @@ def evaluate_char_svm(
         n_examples=n_examples,
         multilingual=multilingual,
         n_test_examples=n_test_examples,
+        n_trials=n_trials,
     )
 
 
@@ -53,6 +55,7 @@ def evaluate_sentence_transformer(
     model: str = "symanto/sn-xlm-roberta-base-snli-mnli-anli-xnli",
     gpu: str = "",
     n_examples: int = 8,
+    n_trials: int = 5,
     multilingual: bool = True,
     n_test_examples: Optional[int] = None,
 ):
@@ -78,6 +81,7 @@ def evaluate_sentence_transformer(
         n_examples=n_examples,
         multilingual=multilingual,
         n_test_examples=n_test_examples,
+        n_trials=n_trials,
     )
 
 

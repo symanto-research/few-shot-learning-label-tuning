@@ -14,12 +14,11 @@
 
 """A meta-dataset for evaluating few-shot learning models for text classification."""
 
-import sys
 from typing import List, Mapping, Optional, Tuple, no_type_check
 
 import datasets
 
-from symanto_fsb.datasets import (  # noqa: F401
+from symanto_fsb.datasets import (
     SemEval2016TaskA,
     cola,
     deisear,
@@ -28,6 +27,16 @@ from symanto_fsb.datasets import (  # noqa: F401
     subj,
     zsb,
 )
+
+_modules = {
+    "SemEval2016TaskA": SemEval2016TaskA,
+    "cola": cola,
+    "deisear": deisear,
+    "sab": sab,
+    "sb10k": sb10k,
+    "subj": subj,
+    "zsb": zsb,
+}
 
 
 @no_type_check
@@ -43,12 +52,16 @@ def load_dataset(
         config = "emotion"
     try:
         ds: Mapping[str, datasets.Dataset] = datasets.load_dataset(
-            getattr(sys.modules[__name__], name).__file__,
+            _modules[name].__file__,
             config,
             ignore_verifications=True,
         )
-    except AttributeError:
-        ds: Mapping[str, datasets.Dataset] = datasets.load_dataset(name, config)
+    except KeyError:
+        ds: Mapping[str, datasets.Dataset] = datasets.load_dataset(
+            name,
+            config,
+            ignore_verifications=True,
+        )
 
     for split_name in ds:
 
