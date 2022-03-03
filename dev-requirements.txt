@@ -1,0 +1,10 @@
+autoflake
+black
+devtools
+flake8
+isort
+mypy
+pytest
+pytest-azurepipelines
+pytest-cov
+pytest-cov

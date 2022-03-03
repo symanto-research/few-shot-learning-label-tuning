@@ -3,7 +3,67 @@ A few-shot learning method based on siamese networks.
 
 Code & models for the [paper](https://openreview.net/forum?id=za_XIJLkkB8) to appear at [ACL 2022](https://www.2022.aclweb.org/).
 
-**Code coming soon ...**
+# The Symanto Few-Shot Benchmark
+
+`symanto-fsb` implements the benchmark discussed in ["Few-Shot Learning with Siamese Networks and Label Tuning"](https://openreview.net/forum?id=DU5CNf4sopk).
+
+It can be easily extended to evaluate new models.
+See the extension section below.
+
+## Installation
+
+### From source:
+
+```console
+pip install -e .
+```
+
+## CLI
+
+### Char-SVM
+
+```console
+symanto-fsb evaluate-char-svm output/char_svm
+```
+
+### Sentence-Transformer
+
+#### Zero-Shot
+
+```console
+symanto-fsb \
+   evaluate-sentence-transformer \
+    output/pml-mpnet \
+    --gpu 0 \
+    --n-examples=0
+```
+
+#### Few-Shot
+
+```console
+symanto-fsb \
+   evaluate-sentence-transformer \
+    output/pml-mpnet \
+    --gpu 0 \
+    --n-examples=8
+```
+
+## Extension
+
+In general a new model is added by adding:
+
+1. A new implementation of the [Predictor](symanto_fsb/models/predictors/__init__.py) interface
+2. A new command to [cli.py](symanto_fsb/cli.py)
+
+
+## Testing & Maintenance
+
+```console
+pip install -r dev-requirements.txt
+dev-tools/format.sh
+dev-tools/lint.sh
+dev-tools/test.sh
+```
 
 ## Models
 
