@@ -3,12 +3,81 @@ A few-shot learning method based on siamese networks.
 
 Code & models for the [paper](https://openreview.net/forum?id=za_XIJLkkB8) to appear at [ACL 2022](https://www.2022.aclweb.org/).
 
-**Code coming soon ...**
+# The Symanto Few-Shot Benchmark
+
+`symanto-fsb` implements the benchmark discussed in the paper.
+
+It can be easily extended to evaluate new models.
+See the extension section below.
+
+## Installation
+
+```console
+pip install -e .
+```
+
+## CLI
+
+### Char-SVM
+
+```console
+symanto-fsb evaluate-char-svm output/char_svm --n-trials=1
+```
+
+This will run the specified number of trials on each dataset and write results to the output directory. Afterwards you can create a result table:
+
+```console
+symanto-fsb report output /tmp/report.tsv
+```
+
+### Sentence-Transformer
+
+#### Zero-Shot
+
+```console
+symanto-fsb \
+   evaluate-sentence-transformer \
+    output/pml-mpnet \
+    --gpu 0 \
+    --n-examples=0 \
+    --n-trials=1 
+```
+
+#### Few-Shot
+
+```console
+symanto-fsb \
+   evaluate-sentence-transformer \
+    output/pml-mpnet \
+    --gpu 0 \
+    --n-examples=8 \
+    --n-trials=1
+```
+
+## Extension
+
+In general a new model is added by adding:
+
+1. A new implementation of the [Predictor](symanto_fsb/models/predictors/__init__.py) interface
+2. A new command to [cli.py](symanto_fsb/cli.py)
+
+## Known Issues
+
+Datasets hosted on Google Drive do not work right now: [datasets issue/3809](https://github.com/huggingface/datasets/issues/3809)
+
+## Testing & Maintenance
+
+```console
+pip install -r dev-requirements.txt
+dev-tools/format.sh
+dev-tools/lint.sh
+dev-tools/test.sh
+```
 
 ## Models
 
-For the sake of comparability we trained 4 models both English and multi-lingual (ML).
-
+For the sake of comparability we trained 4.
+The code above can be used with the Siamese network models.
 
 ### Cross Attention
 

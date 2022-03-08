@@ -1,0 +1,8 @@
+datasets>=1.18.3
+rdflib>=6.1.1
+sentence-transformers>=2.2.0
+sklearn==0.0
+tensorflow>=2.8.0
+numpy>==1.22.2
+torch>=1.7.1
+typer>=0.4.0
