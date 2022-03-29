@@ -1,7 +1,7 @@
 # Few-Shot Learning with Siamese Networks and Label Tuning
 A few-shot learning method based on siamese networks.
 
-Code & models for the [paper](https://openreview.net/forum?id=za_XIJLkkB8) to appear at [ACL 2022](https://www.2022.aclweb.org/).
+Code & models for the [paper](https://arxiv.org/abs/2203.14655) to appear at [ACL 2022](https://www.2022.aclweb.org/).
 
 # The Symanto Few-Shot Benchmark
 
@@ -101,6 +101,6 @@ This is **not** an official Symanto product!
 	author       = {M{\"u}ller, Thomas and Pérez-Torró, Guillermo and Franco-Salvador, Marc},
 	year         = {2022},
 	booktitle    = {ACL (to appear)},
-	url          = {https://openreview.net/forum?id=za_XIJLkkB8},
+	url          = {https://arxiv.org/abs/2203.14655},
 }
 ```
