@@ -20,17 +20,29 @@ import tensorflow as tf
 from sklearn.metrics import f1_score
 
 
+_NEG_INFINITY = tf.float32.min
+
+
 def _mf1(x, y):
     return f1_score(x, y, average="macro") * 100.0
 
 
-def _get_loss(text_embeddings, text_labels, label_embeddings, dropout: float):
+def _get_loss(
+    text_embeddings,
+    text_labels,
+    label_embeddings,
+    dropout: float,
+    loss_type: str = "softmax",
+    epsilon: float = 1.0,
+):
     """
     Args:
         text_embeddings: float[N, k]
         text_labels: float[N,K]
         label_embeddings: float[K, k]
         dropout: Dropout rate for class embeddings. 0.0 for none.
+        loss_type: When BatchSoftmax, use sum_loss instead of margin loss.
+        epsilon: Used for margin loss
     """
     tf.debugging.assert_all_finite(text_embeddings, "Text embeddings is NaN")
     tf.debugging.assert_all_finite(label_embeddings, "Label embeddings is NaN")
@@ -44,14 +56,49 @@ def _get_loss(text_embeddings, text_labels, label_embeddings, dropout: float):
     # float[N,K]
     dot_products = tf.matmul(text_embeddings, tf.transpose(label_embeddings))
     tf.debugging.assert_all_finite(dot_products, "Dot product is NaN")
-    if len(text_labels.shape) == 1:
-        loss_per_example = tf.nn.sparse_softmax_cross_entropy_with_logits(
-            text_labels, dot_products
-        )
+
+    if loss_type == "softmax":
+        if len(text_labels.shape) == 1:
+            loss_per_example = tf.nn.sparse_softmax_cross_entropy_with_logits(
+                text_labels, dot_products
+            )
+        else:
+            loss_per_example = tf.nn.softmax_cross_entropy_with_logits(
+                text_labels, dot_products
+            )
     else:
-        loss_per_example = tf.nn.softmax_cross_entropy_with_logits(
-            text_labels, dot_products
-        )
+        # 2. For every example, get the dot product of the correct class.
+        n_classes = label_embeddings.shape[0]
+        # float[N,K]
+        # (1 if the class is correct, 0 otherwise)
+        correct_class = np.argmax(text_labels, axis=-1)
+        class_mask = tf.one_hot(
+            correct_class, n_classes
+        )  # pylint: disable=no-value-for-parameter
+        # float[N]
+        correct_dots = tf.reduce_sum(dot_products * class_mask, axis=-1)
+
+        # 3. For every example, get the highest dot product of an incorrect class.
+        if loss_type == "margin":
+            # float[N,K]
+            mask_dot_products = dot_products + (class_mask * _NEG_INFINITY)
+            # float[N]
+            wrong_dots = tf.reduce_max(mask_dot_products, axis=-1)
+        elif loss_type == "sum":
+            num_classes = label_embeddings.shape[0]
+            wrong_dots = (
+                tf.reduce_sum(dot_products, axis=-1) - correct_dots
+            ) / (num_classes - 1)
+        else:
+            raise NotImplementedError(loss_type)
+
+        # 4. Compute the difference per example.
+        loss_per_example = correct_dots - wrong_dots
+        # float[N]
+        if loss_type == "margin":
+            loss_per_example = tf.minimum(loss_per_example, epsilon)
+        loss_per_example = -loss_per_example
+
     tf.debugging.assert_all_finite(loss_per_example, "Loss per example is NaN")
     return tf.reduce_mean(loss_per_example)
 
@@ -64,6 +111,7 @@ def label_tuning(
     reg_coefficient: float,
     learning_rate: float,
     dropout: float,
+    **kwargs,
 ) -> np.ndarray:
     """
     With N as number of examples, K as number of classes, k as embedding dimension.
@@ -94,6 +142,7 @@ def label_tuning(
                 text_labels,
                 label_embeddings,
                 dropout=dropout,
+                **kwargs,
             )
             drift_loss = tf.reduce_mean(
                 (label_embeddings - init_label_embeddings) ** 2
@@ -141,7 +190,7 @@ def _get_complement(folds: List[List[int]], fold: List[int]) -> List[int]:
 
 
 def _evaluate_hparams(
-    text_embeddings, text_labels, label_embeddings, folds, hparams
+    text_embeddings, text_labels, label_embeddings, folds, loss_type, hparams
 ):
     predictions = []
     references = []
@@ -154,6 +203,7 @@ def _evaluate_hparams(
             tr_text_embeddings,
             tr_text_labels,
             label_embeddings,
+            loss_type=loss_type,
             **hparams,
         )
         te_text_embeddings = text_embeddings[test_indexes]
@@ -171,6 +221,7 @@ def find_hparams(
     text_labels,
     label_embeddings,
     num_folds: int,
+    loss_type: str = "softmax",
     configs: Optional[List[dict]] = None,
     n_workers: int = 1,
 ) -> dict:
@@ -198,6 +249,7 @@ def find_hparams(
                 text_labels,
                 label_embeddings,
                 folds,
+                loss_type,
                 hparams,
             )
             mf1s.append(mf1)
@@ -214,6 +266,7 @@ def find_hparams(
                     text_labels,
                     label_embeddings,
                     folds,
+                    loss_type,
                     hparams,
                 )
             )
